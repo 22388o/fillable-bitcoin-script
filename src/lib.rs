@@ -56,6 +56,10 @@ impl From<Script> for FillableScript {
             }
         }
 
+        if !cur_script.is_empty() {
+            scripts.push(cur_script);
+        }
+
         Self { scripts }
     }
 }
@@ -75,6 +79,22 @@ mod test {
             OP_EQUAL
         };
 
-        let _ = FillableScript::from(script);
+        let scripts = FillableScript::from(script);
+        assert_eq!(
+            scripts.scripts[0],
+            script! {
+                OP_PUSHBYTES_1 OP_PUSHBYTES_1
+            }
+            .as_bytes()
+        );
+        assert_eq!(
+            scripts.scripts[1],
+            script! {
+                OP_CAT
+                OP_PUSHBYTES_2 OP_PUSHBYTES_1 OP_PUSHBYTES_2
+                OP_EQUAL
+            }
+            .as_bytes()
+        );
     }
 }
